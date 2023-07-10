@@ -104,7 +104,7 @@ public class CloudController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthToken authToken) throws Exception {
         System.out.println("request : "+authToken.getLogin()+" "+authToken.getPassword());
-       // authenticate(authToken.getLogin(), authToken.getPassword());
+        authenticate(authToken.getLogin(), authToken.getPassword());
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authToken.getLogin());
 
