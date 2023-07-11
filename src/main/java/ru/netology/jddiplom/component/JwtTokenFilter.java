@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.netology.jddiplom.repository.UsersRepository;
+import ru.netology.jddiplom.service.JwtTokenService;
 import ru.netology.jddiplom.service.JwtUserDetailsService;
 
 import java.io.IOException;
@@ -24,7 +26,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 //import static sun.util.locale.LocaleUtils.isEmpty;
 
 //import static sun.util.locale.LocaleUtils.isEmpty;
-
+/*
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
     @Autowired
@@ -74,4 +76,46 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
 
+}
+
+
+ */
+
+@RequiredArgsConstructor
+public class JwtTokenAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtTokenService jwtTokenService;
+    private final UsersRepository usersRepository;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String token = getToken(request);
+        if (jwtTokenService.isTokenValid(token)) {
+            authenticateUser(token);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private void authenticateUser(String token) {
+        UserDetails user = getUser(token);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private UserDetails getUser(String token) {
+        return usersRepository.findById(jwtTokenService.getUserId(token)).get();
+    }
+
+    private String getToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token == null || token.isEmpty() || !token.startsWith("Bearer ")) {
+            return null;
+        }
+
+        return token.substring(7, token.length());
+
+    }
 }

@@ -1,6 +1,7 @@
 package ru.netology.jddiplom.configuration;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,17 +25,20 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import ru.netology.jddiplom.repository.UserData;
+import ru.netology.jddiplom.repository.UsersRepository;
 import ru.netology.jddiplom.service.CloudService;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
@@ -44,6 +48,8 @@ public class WebSecurityConfig {
 
 //    @Autowired
 //    private DataSource dataSource;
+
+ */
 /*
     @Bean
     public UserDetailsManager authenticateUsers() {
@@ -80,11 +86,15 @@ public class WebSecurityConfig {
 
 
 
+
+/*
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+ */
 /*
 
     @Bean
@@ -117,7 +127,7 @@ public class WebSecurityConfig {
                 .build();
     }
 */
-
+/*000
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -135,6 +145,8 @@ public class WebSecurityConfig {
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and();
+
+ */
 /*
         http.exceptionHandling()
                 .authenticationEntryPoint(
@@ -149,6 +161,7 @@ public class WebSecurityConfig {
 
 
  */
+/*000
         http.authorizeHttpRequests().requestMatchers("/**")
                 .permitAll();
                 //.hasRole("USER");
@@ -156,6 +169,8 @@ public class WebSecurityConfig {
                 //.formLogin();
         return http.build();
     }
+
+ */
 /*
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -171,7 +186,43 @@ public class WebSecurityConfig {
 
 
 
-
+/*
 }
 
+ */
 
+@Configuration
+@RequiredArgsConstructor
+//@Profile("default")
+public class WebSecurityConfiguration {
+
+    private final UsersRepository usersRepository;
+    private final JwtTokenService jwtTokenService;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    protected AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests(auth -> {
+                    auth
+                            //.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                            //.antMatchers("/v1/user/forgotMyPassword/**").permitAll()
+                            //.antMatchers(HttpMethod.POST, "/v1/user", "/auth").permitAll()
+                            .anyRequest().authenticated();
+                })
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(new JwtTokenAuthenticationFilter(jwtTokenService, usersRepository), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+}
