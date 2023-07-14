@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.netology.jddiplom.repository.UserData;
 import ru.netology.jddiplom.repository.UsersRepository;
@@ -14,6 +15,7 @@ import ru.netology.jddiplom.repository.UsersRepository;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/*
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
     @Autowired
@@ -23,7 +25,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //        UserDetails user = usersRepository.findByLogin(username);
         UserData userData = usersRepository.findByLogin(username);
-        if (userData == null) {
+                if (userData == null) {
             throw new UsernameNotFoundException("Unknown user: " + username);
         }
         UserDetails ud = User.builder()
@@ -33,43 +35,27 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .build();
         return ud;
     }
-    /*
-            @Override
-            public String getPassword() {
-                return null;
-            }
 
-            @Override
-            public String getUsername() {
-                return null;
-            }
+}
+*/
+@Service
+public class JwtUserDetailsService implements UserDetailsService {
 
-            @Override
-            public boolean isAccountNonExpired() {
-                return false;
-            }
-
-            @Override
-            public boolean isAccountNonLocked() {
-                return false;
-            }
-
-            @Override
-            public boolean isCredentialsNonExpired() {
-                return false;
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return false;
-            }
-        }
-
-        if(user == null) {
+    @Autowired
+    private UsersRepository usersRepository;
+//    @Autowired
+//    private BCryptPasswordEncoder passwordEncoder;
+@Autowired
+BCryptPasswordEncoder passwordEncoder;
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        //UserDAO user = userRepository.findByUsername(username);
+        UserData userData = usersRepository.findByLogin(username);
+        if (userData == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new User(user.getUsername(), user.getPassword(), new ArrayList<>());
-    }
 
-     */
+        //return new User(userData.getLogin(), userData.getPassword(), new ArrayList<>());
+        return new User(userData.getLogin(), passwordEncoder.encode(userData.getPassword()), new ArrayList<>());
+    }
 }

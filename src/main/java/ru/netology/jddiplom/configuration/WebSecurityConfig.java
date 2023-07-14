@@ -1,7 +1,6 @@
 package ru.netology.jddiplom.configuration;
 
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -30,26 +30,29 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import ru.netology.jddiplom.component.JwtTokenFilter;
 import ru.netology.jddiplom.repository.UserData;
-import ru.netology.jddiplom.repository.UsersRepository;
 import ru.netology.jddiplom.service.CloudService;
+import ru.netology.jddiplom.service.JwtUserDetailsService;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig {
+    //@Autowired
+    //private JwtTokenFilter jwtTokenFilter;
+
+ //   @Autowired
+ //   private JwtUserDetailsService jwtUserDetailsService;
 //    @Autowired
 //    CloudService cloudService;
 
 //    @Autowired
 //    private DataSource dataSource;
-
- */
 /*
     @Bean
     public UserDetailsManager authenticateUsers() {
@@ -86,15 +89,26 @@ public class WebSecurityConfig {
 
 
 
-
-/*
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+
+        AuthenticationManager manager = authenticationConfiguration.getAuthenticationManager();
+
+        return manager;
     }
 
 
- */
+    /*
+@Bean
+public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder passwordEncoder, JwtUserDetailsService jwtUserDetailsService)
+        throws Exception {
+    return http.getSharedObject(AuthenticationManagerBuilder.class)
+            .userDetailsService(jwtUserDetailsService)
+            .passwordEncoder(passwordEncoder)
+            .and()
+            .build();
+}
+*/
 /*
 
     @Bean
@@ -127,7 +141,8 @@ public class WebSecurityConfig {
                 .build();
     }
 */
-/*000
+
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -135,18 +150,28 @@ public class WebSecurityConfig {
 
 
 
+/*
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+*/
 
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable();
+        http.cors().and().csrf().disable()
+        //.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .requestMatchers("/login")
+                .permitAll()
+                //.dispatcherTypeMatchers(HttpMethod.valueOf("/login")).permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+          //      .and()
 
-        http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and();
-
- */
 /*
         http.exceptionHandling()
                 .authenticationEntryPoint(
@@ -161,16 +186,12 @@ public class WebSecurityConfig {
 
 
  */
-/*000
-        http.authorizeHttpRequests().requestMatchers("/**")
-                .permitAll();
+        //.authorizeHttpRequests().requestMatchers("/**").permitAll();
                 //.hasRole("USER");
                 //.and()
                 //.formLogin();
         return http.build();
     }
-
- */
 /*
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -186,43 +207,7 @@ public class WebSecurityConfig {
 
 
 
-/*
-}
-
- */
-
-@Configuration
-@RequiredArgsConstructor
-//@Profile("default")
-public class WebSecurityConfiguration {
-
-    private final UsersRepository usersRepository;
-    private final JwtTokenService jwtTokenService;
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    protected AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests(auth -> {
-                    auth
-                            //.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                            //.antMatchers("/v1/user/forgotMyPassword/**").permitAll()
-                            //.antMatchers(HttpMethod.POST, "/v1/user", "/auth").permitAll()
-                            .anyRequest().authenticated();
-                })
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new JwtTokenAuthenticationFilter(jwtTokenService, usersRepository), UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
 
 }
+
+
