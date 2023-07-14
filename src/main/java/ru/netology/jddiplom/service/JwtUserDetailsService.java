@@ -45,8 +45,6 @@ public class JwtUserDetailsService implements UserDetailsService {
     private UsersRepository usersRepository;
 //    @Autowired
 //    private BCryptPasswordEncoder passwordEncoder;
-@Autowired
-BCryptPasswordEncoder passwordEncoder;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //UserDAO user = userRepository.findByUsername(username);
@@ -55,7 +53,6 @@ BCryptPasswordEncoder passwordEncoder;
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
 
-        //return new User(userData.getLogin(), userData.getPassword(), new ArrayList<>());
-        return new User(userData.getLogin(), passwordEncoder.encode(userData.getPassword()), new ArrayList<>());
+        return new User(userData.getLogin(), userData.getPassword(), new ArrayList<>());
     }
 }

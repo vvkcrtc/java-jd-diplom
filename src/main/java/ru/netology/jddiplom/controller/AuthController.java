@@ -30,8 +30,6 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-@Autowired
-BCryptPasswordEncoder passwordEncoder;
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
