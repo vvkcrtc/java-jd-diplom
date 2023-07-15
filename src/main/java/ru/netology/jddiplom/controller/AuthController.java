@@ -3,16 +3,16 @@ package ru.netology.jddiplom.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.netology.jddiplom.component.JwtTokenUtil;
 import ru.netology.jddiplom.service.JwtUserDetailsService;
 
@@ -21,33 +21,42 @@ public class AuthController {
 
     Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+//    @Autowired
+//    private JwtTokenUtil jwtTokenUtil;
 
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
+//    @Autowired
+//    private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
 
-
+    //@PostMapping
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthToken authenticationRequest) {
-        System.out.println("request : "+authenticationRequest.getLogin()+" "+authenticationRequest.getPassword());
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthToken authToken) {
+        System.out.println("request : "+authToken.getLogin()+" "+authToken.getPassword());
         UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(authenticationRequest.getLogin(), authenticationRequest.getPassword());
+                new UsernamePasswordAuthenticationToken(authToken.getLogin(), authToken.getPassword());
         try {
+
             authenticationManager.authenticate(token);
+
         } catch (BadCredentialsException e) {
+
             logger.error("Invalid credentials !!!", e);
-            throw e;
+            //throw e;
+            return ResponseEntity.badRequest().body("\"message\","+"\"login:user1, password:12345\"");
+            //new ResponseEntity<>("\"message\","+"\"login:user1, password:12345\"", HttpStatus.BAD_REQUEST);
         }
 
-        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getLogin());
+        //UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getLogin());
 
-        //return ResponseEntity.ok(new AuthResponse(jwtTokenUtil.generateToken(userDetails)));
-        return ResponseEntity.ok(jwtTokenUtil.generateToken(userDetails));
+        //return ResponseEntity.ok("\"auth-token\" :"+authenticationRequest.toString());
+       // return new ResponseEntity<>("\"auth-token\","+"\"login:user1, password:12345\"", HttpStatus.OK);
+        //return ResponseEntity.ok().body("{\"auth-token :\","+"\"login:user1\", \"password:12345\"}");
+        return ResponseEntity.ok().body(authToken);
     }
+
+
 
 }

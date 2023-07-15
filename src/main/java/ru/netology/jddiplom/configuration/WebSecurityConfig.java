@@ -141,34 +141,28 @@ public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPass
                 .build();
     }
 */
-
-
+/*
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-
-/*
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 */
-
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new PasswordWithoutEncode();
+    }
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
         //.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .requestMatchers("/login")
-                .permitAll()
+                //.authorizeRequests()
+                //.requestMatchers("/login")
+                //.permitAll()
                 //.dispatcherTypeMatchers(HttpMethod.valueOf("/login")).permitAll()
-                .anyRequest().authenticated()
-                .and()
+                //.anyRequest().authenticated()
+                //.and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
           //      .and()
 
