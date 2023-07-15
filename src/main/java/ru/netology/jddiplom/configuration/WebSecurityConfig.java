@@ -157,12 +157,14 @@ public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPass
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
         //.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                //.authorizeRequests()
-                //.requestMatchers("/login")
-                //.permitAll()
+                .authorizeRequests()
+                .requestMatchers("/login")
+                .permitAll()
+                .requestMatchers("/logout")
+                .permitAll()
                 //.dispatcherTypeMatchers(HttpMethod.valueOf("/login")).permitAll()
                 //.anyRequest().authenticated()
-                //.and()
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
           //      .and()
 
