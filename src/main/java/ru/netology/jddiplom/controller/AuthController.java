@@ -22,18 +22,10 @@ public class AuthController {
 
     Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-   // @Autowired
-   // private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
 
-    //@PostMapping
-    //@RequestMapping(value = "/login", method = RequestMethod.POST)
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthToken authToken)  {
         System.out.println("request : "+authToken.getLogin()+" "+authToken.getPassword());
@@ -51,11 +43,7 @@ public class AuthController {
 
         }
 
-        //UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authToken.getLogin());
-        //String tokenOut = jwtTokenUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok().body("{\"auth-token\""+":"+"\""+authToken.getLogin()+","+authToken.getPassword()+"\""+"}");
-        //{"auth-token":"login:12345, password:1345"}
+        return ResponseEntity.ok().body(authToken.toString());
     }
 
     @PostMapping("/logout")

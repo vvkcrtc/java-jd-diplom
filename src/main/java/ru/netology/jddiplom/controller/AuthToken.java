@@ -26,4 +26,8 @@ public class AuthToken {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String toString() {
+        return "{\"auth-token\""+":"+"\""+getLogin()+","+getPassword()+"\""+"}";
+    }
 }

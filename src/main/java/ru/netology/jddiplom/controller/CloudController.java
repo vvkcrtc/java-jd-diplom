@@ -19,10 +19,7 @@ public class CloudController {
         files.add(new FileProperty("qwer",1000));
         files.add(new FileProperty("asdf",2000));
         files.add(new FileProperty("zxcv",3000));
-        System.out.println("limit : "+limit);
-        Gson gson = new Gson();
-        String jsonArray = gson.toJson(files);
-        return ResponseEntity.ok().body(jsonArray.toString());
+        return ResponseEntity.ok().body(files);
     }
 
 }
