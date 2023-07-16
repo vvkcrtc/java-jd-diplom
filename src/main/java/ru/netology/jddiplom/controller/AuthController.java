@@ -17,6 +17,7 @@ import ru.netology.jddiplom.service.JwtUserDetailsService;
 import java.io.UnsupportedEncodingException;
 
 @RestController
+@CrossOrigin
 public class AuthController {
 
     Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -32,7 +33,8 @@ public class AuthController {
 
 
     //@PostMapping
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    //@RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthToken authToken)  {
         System.out.println("request : "+authToken.getLogin()+" "+authToken.getPassword());
         UsernamePasswordAuthenticationToken token =
@@ -55,10 +57,18 @@ public class AuthController {
         return ResponseEntity.ok().body("{\"auth-token\""+":"+"\""+authToken.getLogin()+","+authToken.getPassword()+"\""+"}");
         //{"auth-token":"login:12345, password:1345"}
     }
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity<?> userLogout(@RequestBody AuthToken authToken)  {
-        System.out.println("logout : "+authToken.getLogin()+" "+authToken.getPassword());
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> userLogout(@RequestBody String value)  {
+        System.out.println("post value : "+value);
         return ResponseEntity.ok().body("Success  logout");
     }
+
+    @GetMapping("/login")
+    public ResponseEntity<?> getLogout(@RequestParam("logout") @RequestBody String value)  {
+        System.out.println("value : "+value);
+        return ResponseEntity.ok().body("Success  logout");
+    }
+
+
 }
