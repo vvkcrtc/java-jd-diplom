@@ -1,5 +1,7 @@
 package ru.netology.jddiplom.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class AuthToken {
     private String login;
     private String password;
@@ -10,7 +12,7 @@ public class AuthToken {
         this.login = login;
         this.password = password;
     }
-
+    //@JsonProperty("auth-token")
     public String getLogin() {
         return login;
     }

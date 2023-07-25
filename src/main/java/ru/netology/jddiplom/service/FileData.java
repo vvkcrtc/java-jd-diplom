@@ -1,21 +1,26 @@
 package ru.netology.jddiplom.service;
 
-import java.io.File;
+import org.springframework.core.io.Resource;
+import java.io.IOException;
 
 public class FileData {
-    protected FileProperty fileProperty;
-    protected File file;
+    protected Resource resource;
 
-    public FileData(FileProperty fileProperty, File file) {
-        this.fileProperty = fileProperty;
-        this.file = file;
+    public FileData(Resource resource) {
+        this.resource = resource;
     }
 
-    public FileProperty getFileProperty() {
-        return fileProperty;
+    public FileProperty getFileProperty()  {
+        FileProperty fp = null;
+        try {
+            fp = new FileProperty(resource.getFilename(), Math.toIntExact(resource.contentLength()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return fp;
     }
 
-    public File getFile() {
-        return file;
+    public Resource getResource() {
+        return resource;
     }
 }
