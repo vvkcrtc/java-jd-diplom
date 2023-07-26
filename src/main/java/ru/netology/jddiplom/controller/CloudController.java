@@ -2,9 +2,12 @@ package ru.netology.jddiplom.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.netology.jddiplom.service.AuthService;
 import ru.netology.jddiplom.service.CloudService;
 import ru.netology.jddiplom.service.FileSystemStorageService;
 
@@ -20,35 +23,46 @@ public class CloudController {
     @Autowired
     private FileSystemStorageService storageService;
 
+    @Autowired
+    private AuthService authService;
+
+
+
     @GetMapping("/list")
-    public ResponseEntity<?> getList(@RequestParam("limit") @Validated int limit)  {
+    public ResponseEntity<?> getList(@RequestParam("limit") @Validated int limit, @RequestHeader("Auth-Token") String token)  {
+        System.out.println("List ...  token :"+token);
+
         cloudService.printCloud();
-        return ResponseEntity.ok().body(cloudService.getList());
+
+        return ResponseEntity.ok().body(cloudService.getList(authService.getAuthToken(token).getLogin()));
     }
     @PostMapping("/file")
-    public ResponseEntity<?> uploadFile(@RequestParam("filename") @Validated String filename) throws FileNotFoundException {
+    public ResponseEntity<?> uploadFile(@RequestParam("filename") @Validated String filename, @RequestHeader("Auth-Token") String token) throws FileNotFoundException {
 
-        Resource resource = storageService.loadAsResource(filename);
-
-
-        System.out.println("Post file ..."+filename);
-        if(cloudService.addFile(resource)) {
-
-            return ResponseEntity.ok().body(resource);
+        if(authService.isActiveToken(token)) {
+            Resource resource = storageService.loadAsResource(filename);
+            System.out.println("Post file ..." + filename);
+            if (cloudService.addFile(resource, authService.getAuthToken(token).getLogin())) {
+                return ResponseEntity.ok().body(resource);
+            } else
+                return ResponseEntity.badRequest().body("Error loading file" + filename);
+        } else {
+            return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        else
-            return ResponseEntity.badRequest().body("Error loading file"+filename);
     }
 
     @GetMapping("/file")
     public ResponseEntity<?> downloadFile(@RequestParam("filename") @Validated String filename, @RequestHeader("Auth-Token") String token)  {
         System.out.println("Get file ..."+filename+" token "+token);
-        Resource resource =  cloudService.getFileData(filename);
-        if(resource != null) {
-            return ResponseEntity.ok().body(resource);
-        }
-        else {
-            return ResponseEntity.badRequest().body("Error loading file from cloud "+filename);
+        if(authService.isActiveToken(token)) {
+            Resource resource = cloudService.getFileData(filename);
+            if (resource != null) {
+                return ResponseEntity.ok().body(resource);
+            } else {
+                return new ResponseEntity<String>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
 
     }

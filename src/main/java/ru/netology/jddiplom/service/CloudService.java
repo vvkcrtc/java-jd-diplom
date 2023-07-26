@@ -13,20 +13,22 @@ public class CloudService {
     private List<FileData> fileData = new ArrayList<>();
 
 
-    public boolean addFile(Resource resource) {
+    public boolean addFile(Resource resource, String username) {
         if(resource != null && findFileData(resource.getFilename()) == null) {
-            fileData.add( new FileData(resource));
+            fileData.add( new FileData(resource, username));
             return true;
         }
         return false;
     }
 
-    public List<FileProperty> getList()  {
-        List<FileProperty> fileProperty = new ArrayList<>();
+    public List<FileProperty> getList(String username)  {
+        List<FileProperty> fps = new ArrayList<>();
         for(FileData fd : fileData) {
-            fileProperty.add(fd.getFileProperty());
+            if(username.equals(fd.getUserName())) {
+                fps.add(fd.getFileProperty());
+            }
         }
-        return fileProperty;
+        return fps;
     }
 
     public FileData findFileData(String filename) {

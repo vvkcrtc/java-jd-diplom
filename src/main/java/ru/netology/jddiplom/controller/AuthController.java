@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import ru.netology.jddiplom.service.AuthService;
 
 @RestController
 @CrossOrigin
@@ -18,6 +19,8 @@ public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthToken authToken)  {
@@ -25,9 +28,7 @@ public class AuthController {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(authToken.getLogin(), authToken.getPassword());
         try {
-
             authenticationManager.authenticate(token);
-
         } catch (BadCredentialsException e) {
 
             logger.error("Invalid credentials !!!", e);
@@ -35,6 +36,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body("\"message\","+"\"login:user1, password:12345\"");
 
         }
+        authService.addActiveToken(authToken);
         AuthResponse ar = new AuthResponse(authToken);
 
         return ResponseEntity.ok().body(authToken.toString());
@@ -43,14 +45,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> userLogout(@RequestBody String value)  {
-        System.out.println("post value : "+value);
+    public ResponseEntity<?> userLogout(@RequestBody String value, @RequestHeader("Auth-Token") String token)  {
+        System.out.println("post value : "+value+" token ... "+token);
         return ResponseEntity.ok().body("Success  logout");
     }
 
     @GetMapping("/login")
-    public ResponseEntity<?> getLogout(@RequestParam("logout") @RequestBody String value)  {
-        System.out.println("value : "+value);
+    public ResponseEntity<?> getLogout(@RequestParam("logout") @RequestBody String value, @RequestHeader("Auth-Token") String token)  {
+        authService.delActiveAuthToken(token);
         return ResponseEntity.ok().body("Success  logout");
     }
 
