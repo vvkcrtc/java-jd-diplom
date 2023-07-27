@@ -41,7 +41,7 @@ public class CloudService {
 
     }
 
-    public Resource getFileData(String filename) {
+    public Resource getResource(String filename) {
         FileData fd = findFileData(filename);
         if(fd != null) {
             return fd.getResource();

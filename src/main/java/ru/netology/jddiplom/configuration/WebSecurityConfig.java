@@ -15,51 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class WebSecurityConfig {
-    //@Autowired
-    //private JwtTokenFilter jwtTokenFilter;
-
- //   @Autowired
- //   private JwtUserDetailsService jwtUserDetailsService;
-//    @Autowired
-//    CloudService cloudService;
-
-//    @Autowired
-//    private DataSource dataSource;
-/*
-    @Bean
-    public UserDetailsManager authenticateUsers() {
-
-//        UserDetails user = User.withUsername("username") .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode("password")).build();
-        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
-//        users.setAuthoritiesByUsernameQuery("select login,password from UserData where login=?");
-        //users.setUsersByUsernameQuery("select user_name,user_role from user where user_name=?");
-//        users.createUser(user);
-        return users;
-    }
-*/
-
-/*
-    @Bean
-    public UserDetailsService userDetailsService() {
-        List<UserData> users = cloudService.getAll();
-        List<UserDetails> userDetails = new ArrayList<>();
-        for(UserData ud : users) {
-            userDetails.add(User.withDefaultPasswordEncoder()
-                    .username(ud.getLogin())
-                    .password(ud.getPassword())
-                    .roles(ud.getRole())
-                    .build()
-            );
-        }
-
-        return new InMemoryUserDetailsManager(userDetails);
-//        UserDetailsService uds = new InMemoryUserDetailsManager(userDetails);
-//        System.out.println(uds);
-//        return uds;
-    }
-*/
-
-
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -69,115 +24,20 @@ public class WebSecurityConfig {
         return manager;
     }
 
-
-    /*
-@Bean
-public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder passwordEncoder, JwtUserDetailsService jwtUserDetailsService)
-        throws Exception {
-    return http.getSharedObject(AuthenticationManagerBuilder.class)
-            .userDetailsService(jwtUserDetailsService)
-            .passwordEncoder(passwordEncoder)
-            .and()
-            .build();
-}
-*/
-/*
-
-    @Bean
-    public UserDetailsService userDetailsService(BCryptPasswordEncoder passwordEncoder) {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withUsername("user1")
-                .password(passwordEncoder.encode("12345"))
-                .roles("USER")
-                .build());
-        manager.createUser(User.withUsername("admin")
-                .password(passwordEncoder.encode("adminPass"))
-                .roles("USER", "ADMIN")
-                .build());
-
-
-
-
-        return manager;
-    }
-
- */
-    /*
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder passwordEncoder, UserDetailsService userDetailsService)
-            throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder)
-                .and()
-                .build();
-    }
-*/
-/*
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-*/
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new PasswordWithoutEncode();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-        //.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                //.authorizeRequests()
-                //.requestMatchers("/login")
-                //.permitAll()
-                //.requestMatchers("/logout")
-                //.permitAll()
-                //.dispatcherTypeMatchers(HttpMethod.valueOf("/login")).permitAll()
-                //.anyRequest().authenticated()
-                //.and()
                 .logout()
                 .logoutUrl("/logout")
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-          //      .and()
-
-/*
-        http.exceptionHandling()
-                .authenticationEntryPoint(
-                        (request, response, ex) -> {
-                            response.sendError(
-                                    HttpServletResponse.SC_UNAUTHORIZED,
-                                    ex.getMessage()
-                            );
-                        }
-                )
-                .and();
-
-
- */
-        //.authorizeHttpRequests().requestMatchers("/**").permitAll();
-                //.hasRole("USER");
-                //.and()
-                //.formLogin();
         return http.build();
     }
-/*
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
-        return http.build();
-    }
-*/
-
-
-
-
 
 }
 
