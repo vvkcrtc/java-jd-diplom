@@ -10,10 +10,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.netology.jddiplom.service.AuthService;
 import ru.netology.jddiplom.service.CloudService;
-import ru.netology.jddiplom.service.FileData;
-import ru.netology.jddiplom.service.FileSystemStorageService;
+
+
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @RestController
 @CrossOrigin
@@ -23,11 +24,7 @@ public class CloudController {
     private CloudService cloudService;
 
     @Autowired
-    private FileSystemStorageService storageService;
-
-    @Autowired
     private AuthService authService;
-
 
 
     @GetMapping("/list")
@@ -45,10 +42,9 @@ public class CloudController {
     public ResponseEntity<?> uploadFile(@RequestParam("filename") @Validated String filename, @RequestHeader("Auth-Token") String token) throws FileNotFoundException {
 
         if(authService.isActiveToken(token)) {
-            Resource resource = storageService.loadAsResource(filename);
             System.out.println("Post file ..." + filename);
-            if (cloudService.addFile(resource, authService.getAuthToken(token).getLogin())) {
-                return ResponseEntity.ok().body(resource);
+            if (cloudService.addFile(filename, authService.getAuthToken(token).getLogin())) {
+                return ResponseEntity.ok().body(cloudService.getResource(filename));
             } else
                 return ResponseEntity.badRequest().body("Error loading file" + filename);
         } else {
@@ -71,15 +67,14 @@ public class CloudController {
         }
 
     }
-//???
+
     @PutMapping("/file")
-    public ResponseEntity<?> editFileName(@RequestParam("filename")  String filename, @RequestParam("filename") String params, @RequestHeader("Auth-Token") String token)  {
+    public ResponseEntity<?> renameFile(@RequestParam("filename")  String filename, @RequestParam("filename") String params, @RequestHeader("Auth-Token") String token) throws IOException {
 
         System.out.println("Put file ..."+filename+" token "+token+" params ... "+params);
         if(authService.isActiveToken(token)) {
 
-            FileData fileData = cloudService.findFileData(filename);
-            if (fileData != null) {
+            if (cloudService.renameFile(filename) == true) {
                 return ResponseEntity.ok().build();
             } else {
                 return new ResponseEntity<String>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);

@@ -30,6 +30,6 @@ public class AuthToken {
     }
 
     public String toString() {
-        return "{\"auth-token\""+":"+"\""+getLogin()+","+getPassword()+"\""+"}";
+        return getLogin()+","+getPassword();
     }
 }

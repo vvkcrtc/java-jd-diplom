@@ -37,11 +37,9 @@ public class AuthController {
 
         }
         authService.addActiveToken(authToken);
-        AuthResponse ar = new AuthResponse(authToken);
+        AuthResponse ar = new AuthResponse(authToken.toString());
 
-        return ResponseEntity.ok().body(authToken.toString());
-        //return ResponseEntity.ok().body(authToken);
-        //return ResponseEntity.ok().body(ar);
+        return ResponseEntity.ok().body(ar);
     }
 
     @PostMapping("/logout")

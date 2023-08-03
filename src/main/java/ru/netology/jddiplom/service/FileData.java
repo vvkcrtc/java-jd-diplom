@@ -29,6 +29,7 @@ public class FileData {
     public Resource getResource() {
         return resource;
     }
+
     public Resource getResourceByUserName(String  username) {
         if (this.username.equals(username)) {
             return resource;
@@ -38,5 +39,7 @@ public class FileData {
         }
     }
 
-
+    public void setResource(Resource resource) {
+        this.resource = resource;
+    }
 }
