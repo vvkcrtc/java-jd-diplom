@@ -14,6 +14,7 @@ services:
     build: .
     ports:
       - '8080:8080'
+
     #depends_on:
     #      - mysql
 
@@ -21,13 +22,11 @@ services:
   jd-diplom-front-app:
     image:  jd-doplom-front:latest
     container_name: diplom_front
-
-
     build:
       context: ../netology-diplom-frontend
       dockerfile: front.Dockerfile
     ports:
-      - '8080:8080'
+      - '8081:8080'
 
 
 
