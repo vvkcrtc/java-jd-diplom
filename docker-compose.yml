@@ -1,23 +1,28 @@
 version: '2.2'
 services:
-  mysql:
-    image: mysql:latest
-    container_name: mysql_diplom
-    environment:
-      - MYSQL_ROOT_PASSWORD=mysql
-    ports:
-     - "3306:3306"
 
   jd-diplom-app:
     image:  jd-diplom:latest
     container_name: diplom_server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/netology
     build: .
     ports:
       - '8080:8080'
+    depends_on:
+          - mysql
+    volumes:
+      - /home/vvk:/home/vvk:ro
 
-    #depends_on:
-    #      - mysql
-
+  mysql:
+    image: mysql:latest
+    container_name: mysql_diplom
+    environment:
+      - MYSQL_DATABASE:netology
+      - MYSQL_ROOT_PASSWORD:mysql
+      - MYSQL_USER:root
+    ports:
+      - "3306:3306"
 
   jd-diplom-front-app:
     image:  jd-doplom-front:latest
@@ -27,6 +32,3 @@ services:
       dockerfile: front.Dockerfile
     ports:
       - '8081:8080'
-
-
-
