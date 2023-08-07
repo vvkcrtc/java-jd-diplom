@@ -20,11 +20,13 @@ public class AuthService {
     }
 
     public boolean addActiveToken(AuthToken authToken) {
-        if(!activeTokens.contains(authToken)) {
-            activeTokens.add(authToken);
-            return true;
+        for(AuthToken at : activeTokens) {
+            if(at.getLogin().equals(authToken.getLogin())) {
+                return false;
+            }
         }
-        return false;
+        activeTokens.add(authToken);
+        return true;
     }
 
     public AuthToken findActiveAuthToken(String headToken) {

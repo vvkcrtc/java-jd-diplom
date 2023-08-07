@@ -16,6 +16,12 @@ import java.util.List;
 public class CloudService {
     @Autowired
     private FileSystemStorageService storageService;
+/*
+    public CloudService(FileSystemStorageService storageService) {
+        this.storageService = storageService;
+    }
+
+ */
 
 
     private List<FileData> fileData = new ArrayList<>();

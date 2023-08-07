@@ -20,11 +20,14 @@ import java.io.IOException;
 @CrossOrigin
 public class CloudController {
 
-    @Autowired
-    private CloudService cloudService;
+    private final CloudService cloudService;
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
+
+    public CloudController(CloudService cloudService,AuthService authService ) {
+        this.cloudService = cloudService;
+        this.authService = authService;
+    }
 
 
     @GetMapping("/list")
